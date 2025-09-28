@@ -257,3 +257,274 @@ mindmap
 
 
 ````
+
+# 実装サンプル
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>犬も歩けば棒に当たる - 諺の解釈</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .infographic-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: white;
+        }
+        
+        .control-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-panel label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .control-panel select {
+            margin-left: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .main-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tiles-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(var(--tiles-per-row, 3), 1fr);
+            --tiles-per-row: 3;
+        }
+        
+        .tile {
+            aspect-ratio: 3/4;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tile:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tile-original {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+        
+        .tile-disaster {
+            background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
+        }
+        
+        .tile-opportunity {
+            background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
+        }
+        
+        .tile-modern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .tile-title {
+            height: 15%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .description {
+            height: 10%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 0 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .mermaid-container {
+            height: 75%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 1rem 0.5rem;
+            overflow: hidden;
+        }
+        
+        .mermaid {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .mermaid svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .tiles-grid {
+                --tiles-per-row: 2;
+            }
+            .main-title {
+                font-size: 2rem;
+            }
+            .tile-title {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tiles-grid {
+                --tiles-per-row: 1;
+            }
+            .main-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="infographic-container">
+        <div class="control-panel">
+            <label>タイル数/行: 
+                <select id="tilesPerRow">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                </select>
+            </label>
+        </div>
+        
+        <h1 class="main-title">🐕🚶‍♂️🥍 犬も歩けば棒に当たる</h1>
+        
+        <div class="tiles-grid" id="tilesGrid">
+            <div class="tile tile-original">
+                <div class="tile-title">🐕📜✨ 諺の起源</div>
+                <div class="description">江戸時代の教訓から生まれた智慧</div>
+                <div class="mermaid-container">
+                    <div class="mermaid">
+                        timeline
+                            title 🏮 諺の歴史的変遷
+                            section 江戸時代
+                                📜 誕生 : 災難への警告
+                            section 明治時代
+                                🔄 意味拡大 : 好機の発見
+                            section 現代
+                                💡 両義性 : 行動の重要性
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tile tile-modern">
+                <div class="tile-title">🧠⚖️💪 現代的解釈</div>
+                <div class="description">行動にはリスクと機会が両立する</div>
+                <div class="mermaid-container">
+                    <div class="mermaid">
+                        mindmap
+                          root((🐕 行動の哲学))
+                            🎯 積極性
+                              ✅ チャンス獲得
+                              ⚡ 経験値向上
+                              🔍 視野拡大
+                            ⚖️ リスク管理
+                              📊 確率思考
+                              🛡️ 準備の重要性
+                              💡 学習機会
+                            🌟 成功法則
+                              🚀 行動第一
+                              🔄 試行錯誤
+                              📈 継続改善
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mermaidの初期化
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#333333',
+                primaryBorderColor: '#666666',
+                lineColor: '#444444',
+                secondaryColor: '#f8f9fa',
+                tertiaryColor: '#e9ecef'
+            }
+        });
+
+        // タイル数制御
+        const tilesPerRowSelect = document.getElementById('tilesPerRow');
+        const tilesGrid = document.getElementById('tilesGrid');
+
+        tilesPerRowSelect.addEventListener('change', function() {
+            const tilesPerRow = this.value;
+            tilesGrid.style.setProperty('--tiles-per-row', tilesPerRow);
+        });
+
+        // タイルホバー効果の強化
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('mouseenter', function() {
+                this.style.zIndex = '10';
+            });
+            
+            tile.addEventListener('mouseleave', function() {
+                this.style.zIndex = '1';
+            });
+        });
+    </script>
+</body>
+</html>
+```
