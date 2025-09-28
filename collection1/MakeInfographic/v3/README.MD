@@ -3,7 +3,9 @@
 
 「タイルのサンプル」を参考に、ユーザーから与えられたテーマをもとにインフォグラフィックの作成を開始してください。
 # タイルのサンプル
+```html
 <div class="container"> <h1>🧠 💡 ⚡ 多層パーセプトロン</h1> <div class="tile"> <div class="tile-title">多層パーセプトロン (MLP)</div><div class="description">全結合層のみで構成される最も基本的なニューラルネットワーク。分類・回帰問題の基礎</div>  <div class="mermaid-container"> <div class="mermaid"> flowchart LR A[📥入力層] --> B[⚡隠れ層1] --> C[💡隠れ層2] --> D[🎯出力層] style A fill:#e1f5fe style B fill:#f3e5f5 style C fill:#f3e5f5 style D fill:#fff3e0 </div> </div> </div> </div>
+````
 
 # v3カスタマイズ
 mermaid図は上に詰めて表示させる。
