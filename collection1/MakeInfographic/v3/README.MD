@@ -272,7 +272,7 @@ mindmap
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>犬も歩けば棒に当たる - 諺の解釈</title>
+    <title>分かりやすい説明の技術</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
     <style>
         * {
@@ -282,156 +282,193 @@ mindmap
         }
         
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+            background: white;
             min-height: 100vh;
             padding: 1rem;
         }
         
         .infographic-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            color: white;
         }
         
         .control-panel {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: #f8f9fa;
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
         }
         
         .control-panel label {
             font-weight: 600;
-            font-size: 1rem;
+            color: #d32f2f;
+            font-size: 1.1rem;
         }
         
-        .control-panel select {
-            margin-left: 0.5rem;
-            padding: 0.5rem;
+        select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #ddd;
             border-radius: 8px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
             font-size: 1rem;
+            margin-left: 1rem;
+            background: white;
             cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #a8d8ea;
         }
         
         .main-title {
             text-align: center;
             font-size: 2.5rem;
-            font-weight: 700;
+            color: #1976d2;
             margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+            font-weight: 700;
         }
         
         .tiles-grid {
             display: grid;
             gap: 1.5rem;
             grid-template-columns: repeat(var(--tiles-per-row, 3), 1fr);
-            --tiles-per-row: 3;
+            transition: all 0.5s ease;
         }
         
         .tile {
             aspect-ratio: 3/4;
             border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             overflow: hidden;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            position: relative;
-            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tile:nth-child(1) {
+            background: linear-gradient(135deg, #ffd7d7 0%, #ffe6e6 100%);
+            border-color: #ffb3b3;
+        }
+        
+        .tile:nth-child(2) {
+            background: linear-gradient(135deg, #ffe4b3 0%, #fff0d6 100%);
+            border-color: #ffcc80;
+        }
+        
+        .tile:nth-child(3) {
+            background: linear-gradient(135deg, #fff2b3 0%, #fff8d6 100%);
+            border-color: #ffe082;
+        }
+        
+        .tile:nth-child(4) {
+            background: linear-gradient(135deg, #d7ffd7 0%, #e6ffe6 100%);
+            border-color: #b3ffb3;
+        }
+        
+        .tile:nth-child(5) {
+            background: linear-gradient(135deg, #b3e6ff 0%, #d6f2ff 100%);
+            border-color: #80d4ff;
+        }
+        
+        .tile:nth-child(6) {
+            background: linear-gradient(135deg, #d7b3ff 0%, #e6d6ff 100%);
+            border-color: #c080ff;
+        }
+        
+        .tile:nth-child(7) {
+            background: linear-gradient(135deg, #ffb3e6 0%, #ffd6f0 100%);
+            border-color: #ff80cc;
         }
         
         .tile:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
-        
-        .tile-original {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-        }
-        
-        .tile-disaster {
-            background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);
-        }
-        
-        .tile-opportunity {
-            background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);
-        }
-        
-        .tile-modern {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
         }
         
         .tile-title {
-            height: 15%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
             font-weight: 700;
+            color: #d32f2f;
+            padding: 1rem 1rem 0.5rem;
             text-align: center;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(5px);
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            line-height: 1.3;
+        }
+        
+        .tile:nth-child(1) .tile-title {
+            color: #e91e63;
+        }
+        
+        .tile:nth-child(2) .tile-title {
+            color: #ff9800;
+        }
+        
+        .tile:nth-child(3) .tile-title {
+            color: #ffc107;
+        }
+        
+        .tile:nth-child(4) .tile-title {
+            color: #4caf50;
+        }
+        
+        .tile:nth-child(5) .tile-title {
+            color: #2196f3;
+        }
+        
+        .tile:nth-child(6) .tile-title {
+            color: #9c27b0;
+        }
+        
+        .tile:nth-child(7) .tile-title {
+            color: #e91e63;
         }
         
         .description {
-            height: 10%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
+            font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+            color: #1565c0;
+            padding: 0 1rem 0.5rem;
             text-align: center;
-            padding: 0 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-weight: 500;
+            line-height: 1.4;
+            font-weight: 600;
         }
         
         .mermaid-container {
-            height: 75%;
+            flex: 1;
+            padding: 0 0.5rem 1rem;
             display: flex;
             align-items: flex-start;
             justify-content: center;
-            padding: 1rem 0.5rem;
             overflow: hidden;
         }
         
         .mermaid {
             width: 100%;
-            height: 100%;
+            height: auto;
+            font-size: clamp(0.6rem, 1.2vw, 0.8rem) !important;
         }
         
         .mermaid svg {
             max-width: 100%;
-            max-height: 100%;
+            height: auto;
+        }
+        
+        @media (max-width: 1200px) {
+            .tiles-grid { --tiles-per-row: 2; }
         }
         
         @media (max-width: 768px) {
-            .tiles-grid {
-                --tiles-per-row: 2;
-            }
-            .main-title {
-                font-size: 2rem;
-            }
-            .tile-title {
-                font-size: 0.9rem;
-            }
+            .tiles-grid { --tiles-per-row: 1; }
+            .main-title { font-size: 2rem; }
         }
         
         @media (max-width: 480px) {
-            .tiles-grid {
-                --tiles-per-row: 1;
-            }
-            .main-title {
-                font-size: 1.8rem;
-            }
+            body { padding: 0.5rem; }
+            .control-panel { padding: 0.75rem; }
+            .main-title { font-size: 1.75rem; }
         }
     </style>
 </head>
@@ -499,34 +536,42 @@ mindmap
             startOnLoad: true,
             theme: 'base',
             themeVariables: {
-                primaryColor: '#ffffff',
-                primaryTextColor: '#333333',
-                primaryBorderColor: '#666666',
-                lineColor: '#444444',
+                primaryColor: '#e1f5fe',
+                primaryTextColor: '#d32f2f',
+                primaryBorderColor: '#1976d2',
+                lineColor: '#4caf50',
                 secondaryColor: '#f8f9fa',
-                tertiaryColor: '#e9ecef'
-            }
+                tertiaryColor: '#e9ecef',
+                background: '#ffffff',
+                mainBkg: '#ffffff',
+                secondaryBkg: '#f8f9fa',
+                nodeBorder: '#1976d2',
+                clusterBkg: '#fff3e0',
+                clusterBorder: '#ff9800',
+                defaultLinkColor: '#1976d2',
+                titleColor: '#d32f2f',
+                edgeLabelBackground: '#ffffff'
+            },
+            mindmap: {
+                padding: 10
+            },
+            timeline: {
+                padding: 10
+            },
+            flowchart: {
+                padding: 10
+            },
+            fontFamily: 'Hiragino Sans, Yu Gothic, sans-serif'
         });
-
-        // タイル数制御
-        const tilesPerRowSelect = document.getElementById('tilesPerRow');
-        const tilesGrid = document.getElementById('tilesGrid');
-
-        tilesPerRowSelect.addEventListener('change', function() {
-            const tilesPerRow = this.value;
-            tilesGrid.style.setProperty('--tiles-per-row', tilesPerRow);
+        
+        // タイル数制御機能
+        document.getElementById('tilesPerRow').addEventListener('change', function() {
+            const tilesGrid = document.getElementById('tilesGrid');
+            tilesGrid.style.setProperty('--tiles-per-row', this.value);
         });
-
-        // タイルホバー効果の強化
-        document.querySelectorAll('.tile').forEach(tile => {
-            tile.addEventListener('mouseenter', function() {
-                this.style.zIndex = '10';
-            });
-            
-            tile.addEventListener('mouseleave', function() {
-                this.style.zIndex = '1';
-            });
-        });
+        
+        // 初期値設定
+        document.getElementById('tilesGrid').style.setProperty('--tiles-per-row', '3');
     </script>
 </body>
 </html>
