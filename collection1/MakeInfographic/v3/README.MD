@@ -537,7 +537,7 @@ mindmap
             theme: 'base',
             themeVariables: {
                 primaryColor: '#e1f5fe',
-                primaryTextColor: '#d32f2f',
+                primaryTextColor: '#000000',
                 primaryBorderColor: '#1976d2',
                 lineColor: '#4caf50',
                 secondaryColor: '#f8f9fa',
@@ -549,7 +549,7 @@ mindmap
                 clusterBkg: '#fff3e0',
                 clusterBorder: '#ff9800',
                 defaultLinkColor: '#1976d2',
-                titleColor: '#d32f2f',
+                titleColor: '#000000',
                 edgeLabelBackground: '#ffffff'
             },
             mindmap: {
