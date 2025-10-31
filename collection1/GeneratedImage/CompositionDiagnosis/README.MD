@@ -1,4 +1,5 @@
-
+AutomaticSubdivisionJapaneseYaml
+より派生
 
 
 逆にアップロードされた画像から構図を読み取り細分化された日本語yamlを作成するプロンプトも作ってほしい。
