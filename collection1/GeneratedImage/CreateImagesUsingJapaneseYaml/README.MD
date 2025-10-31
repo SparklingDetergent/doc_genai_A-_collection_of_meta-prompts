@@ -1,4 +1,5 @@
-
+ImageAndVideoCreation
+より派生。
 
 # フェーズ2: 反復改善サイクル
 
