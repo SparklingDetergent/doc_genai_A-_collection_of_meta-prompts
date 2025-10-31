@@ -55,13 +55,9 @@
 
 ## ステップG：改訂版プロンプト
 
-<invoke name="artifacts">
-<parameter name="command">rewrite</parameter>
-<parameter name="type">text/markdown</parameter>
-<parameter name="id">improved_video_prompt_v1</parameter>
-<parameter name="title">画像生成YAML作成プロンプト v2.0</parameter>
-<parameter name="content"># 画像生成YAML作成プロンプト v2.0
 ````
+# 画像生成YAML作成プロンプト
+
 ## システム概要
 ユーザーの画像イメージを、画像生成AI用の構造化された日本語YAMLプロンプトに変換します。
 
