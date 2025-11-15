@@ -148,7 +148,7 @@ Stage 4: フィルタリング・構造化完了 [##########] 100%
 ## ステップC：改善版プロンプト提示
 
 以下、**提案1（再帰的収集）と提案2（価値スコア）を統合した改善版**を作成しました。
-
+````
 <invoke name="artifacts">
 <parameter name="command">create</parameter>
 <parameter name="type">text/markdown</parameter>
@@ -367,3 +367,4 @@ graph TB
 - 最大件数：50-500件（デフォルト：200件）
 - 分析モード：速報/標準/徹底（デフォルト：標準）
 </parameter>
+````
