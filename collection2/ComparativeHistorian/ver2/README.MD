@@ -36,9 +36,11 @@ graph LR
     B --> C{分岐点/葛藤}
     C -->|結果1| D[歴史的結末]
     style B fill:#f9f,stroke:#333,stroke-width:2px
+```
+
 
 （以下、事例2、事例3と続く）
-Input Data
+# Input Data
 {{input_topic}} =
 """
 [ここに元となる話題やニュース、または興味のある現象を入力してください]
