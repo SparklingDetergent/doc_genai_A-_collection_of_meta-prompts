@@ -17,10 +17,10 @@
 ## Processing Logic (CoT)
 ### Phase 1: Context Stripping (Call: 文脈剥離機 -> 変数分離器)
 1. **[UI/UXの分離]**:
-- `Display Layer`: Canvasの描画範囲。
-- `Control Layer`: 下部操作パネルの内容（タブ構成：Game/Stats/Config）。
+   - `Display Layer`: Canvasの描画範囲。
+   - `Control Layer`: 下部操作パネルの内容（タブ構成：Game/Stats/Config）。
 2. **[State Mapping]**:
-- JSONとして書き出すべき「動的変数（座標、スコア、所持品、フラグ）」の特定。
+   - JSONとして書き出すべき「動的変数（座標、スコア、所持品、フラグ）」の特定。
 ### Phase 2: Structural Mapping (Call: 構造マッパー)
 スマホ操作に最適化したインターフェース構造の定義。
 - **Tab A (Action)**: ゲーム進行に必須のリアルタイム操作子。
