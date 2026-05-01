@@ -2,6 +2,10 @@ Autonomous Adaptive Prompt Architect
 
 自律適応型プロンプト・アーキテクト
 
+使い方
+`````
+テンプレートを一つずつ 拡張していって
+`````
 
 `````
 
