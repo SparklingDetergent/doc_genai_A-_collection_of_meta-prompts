@@ -174,6 +174,9 @@ Only when the user says it. Steps:
 4. If there are duplicate folders with the same name, do NOT delete or merge them. Report them and tell the user to merge by hand.
 5. Run the verify listing again. Print the counts. Say 整理OK only if there is exactly one active STATE, no stray log files, and no duplicate folders.
 
+## COMMAND: テンプレート
+Output the current STATE file in a single code block (markdown), exactly as it is stored, with no changes, no omissions, and no commentary before or after the block. The block must start with ```markdown and end with ```. Nothing else.
+
 ## HISTORY SEARCH
 Only when the user explicitly asks about past versions or past dialogs. Old STATE files and skill snapshots are in SSOT_Backup. Past dialogs are in SSOT_Logs. Say which folder each result came from. Do not mix them with current data. (The startup RESUME in start steps 7 to 10 is the only automatic read of SSOT_Logs.)
 
@@ -320,6 +323,21 @@ Only when the user explicitly asks about past versions or past dialogs. Old STAT
   - 日付: 2026-10-30
   - トピック: ログ要点のテーマ制限撤廃
   - 内容: 起動時のログ要点はテーマを問わず全件出す。仕事以外の話題を隠す設計が「仕事の話題なし」の連発を招いたため廃止した。
+
+- D19
+  - 種類: 決定
+  - 状態: 有効
+  - 日付: 2026-10-30
+  - トピック: 終業時のキリの良さ
+  - 内容: 終業時のモヤモヤは課題の未完了ではなく反すう思考と再開欲求によるため、作業自体の完了ではなく「明日の最初の一手」の具体化をもって完了とする。
+
+- R20
+  - 種類: ルール
+  - 状態: 有効
+  - 日付: 2026-10-30
+  - トピック: 退勤前の一手メモ
+  - 内容: 作業が途中で終わる際は、「いつ・どこで・何から始めるか」を1行で具体的に書き残し、脳の未完了ループを意図的に遮断してから席を立つ。
+
 ```
 
 
