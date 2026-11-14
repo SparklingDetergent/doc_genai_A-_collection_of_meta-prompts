@@ -17,7 +17,7 @@
 | 置換する値 | 本ガイドの例 | 登場箇所 |
 | --- | --- | --- |
 | サーバーIP | 192.168.1.10 | クライアントURL、テスト |
-| ポート | 9418 | 起動スクリプト、FWルール、クライアントURL |
+| ポート | 9418 | 起動スクリプト、クライアントURL |
 | リポジトリ置き場 | D:\\Git\\repos | OS設定、起動スクリプト、リポジトリ作成 |
 | ログ置き場 | D:\\Git\\logs | OS設定、起動スクリプト |
 | スクリプト置き場 | D:\\Git\\scripts | OS設定、タスク |
@@ -83,7 +83,7 @@ OS設定はフォルダ準備だけです。レジストリ(長いパス対応�
 
 ## 2. Git for Windows インストール(サーバー・クライアント共通)
 
-1. https://git-scm.com/download/win から最新の「Git for Windows/x64 Setup」を取得(ARM64機は ARM64版)
+1. https://git-scm.com/download/win から最新の「Git for Windows/x64 Setup」を取得(ARM64機は ARM64版。`safe.directory '*'` のため 2.36.0 以降を使用)
 2. 起動して全画面で「Next」、最後に「Install」→「Finish」。画面での選択は一切変えない
 3. PowerShell を開き直して `git --version` で確認
 
@@ -108,9 +108,9 @@ git config --list --show-origin | Tee-Object -FilePath 'C:\GitBuild\before\git_e
 git config --system --list --show-origin | Tee-Object -FilePath 'C:\GitBuild\before\git_system.txt'
 # global 範囲のみ: 空やエラーなら未設定
 git config --global --list --show-origin 2>&1 | Tee-Object -FilePath 'C:\GitBuild\before\git_global.txt'
-# 設定ファイル本体のコピー: 元に戻す時はこのコピーを元の場所へ戻す
+# 設定ファイル本体のコピー: 元に戻す時はこのコピーを元の場所へ戻す(~ は PowerShell 5.1 で解決されない場合があるため $env:USERPROFILE を使用)
 Copy-Item 'C:\Program Files\Git\etc\gitconfig' 'C:\GitBuild\before\gitconfig_system.bak' -ErrorAction SilentlyContinue
-Copy-Item '~\.gitconfig' 'C:\GitBuild\before\gitconfig_global.bak' -ErrorAction SilentlyContinue
+Copy-Item "$env:USERPROFILE\.gitconfig" 'C:\GitBuild\before\gitconfig_global.bak' -ErrorAction SilentlyContinue
 ```
 
 ### 3-1 設定変更
@@ -126,7 +126,7 @@ git config --system core.quotepath false
 git config --system core.symlinks false
 # core.longpaths: false(既定)→false(明示。260文字を超える異常なパス構造を許容せず、Windows標準の制限に揃える)
 git config --system core.longpaths false
-# core.editor: Vim(インストーラ既定)→notepad(Vim操作を知らない保守担当者でも編集できるように)
+# core.editor: Vim(インストーラ既定)→notepad(Vim操作を知らない保守担当者でも編集できるように。保存してメモ帳を閉じるまでGitが待機する)
 git config --system core.editor notepad
 # core.logAllRefUpdates: bareでは無効(既定)→false(明示。サーバー側bareリポジトリに不要なreflogを蓄積させない)
 git config --system core.logAllRefUpdates false
@@ -170,15 +170,15 @@ git config --system transfer.fsckObjects true
 
 ### 4-0 変更前の記録(before)
 
-各ユーザーが自分のアカウントで実行します。保存先は各ユーザーのホーム配下(`~\GitBuild\before`)で、ユーザーごとに分かれ権限の問題も出ません。
+各ユーザーが自分のアカウントで実行します。保存先は各ユーザーのホーム配下(`$env:USERPROFILE\GitBuild\before`)で、ユーザーごとに分かれ権限の問題も出ません(PowerShell 5.1 で `~` が `Tee-Object` 等で展開されない場合があるため `$env:USERPROFILE` を使用します)。
 
 ```powershell
 # 保存先フォルダ作成: ホーム配下(既にあればそのまま)
-New-Item -ItemType Directory -Force -Path '~\GitBuild\before' | Out-Null
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\GitBuild\before" | Out-Null
 # 自分の global 設定の実効値と出所: 空やエラーなら未設定
-git config --global --list --show-origin 2>&1 | Tee-Object -FilePath '~\GitBuild\before\git_global.txt'
+git config --global --list --show-origin 2>&1 | Tee-Object -FilePath "$env:USERPROFILE\GitBuild\before\git_global.txt"
 # 自分の .gitconfig 本体のコピー: 元に戻す時はこのコピーを戻す
-Copy-Item '~\.gitconfig' '~\GitBuild\before\gitconfig_global.bak' -ErrorAction SilentlyContinue
+Copy-Item "$env:USERPROFILE\.gitconfig" "$env:USERPROFILE\GitBuild\before\gitconfig_global.bak" -ErrorAction SilentlyContinue
 ```
 
 ### 4-1 設定変更
@@ -188,6 +188,8 @@ Copy-Item '~\.gitconfig' '~\GitBuild\before\gitconfig_global.bak' -ErrorAction S
 git config --global user.name '<YOUR NAME>'
 # user.email: 未設定→各自のメール(コミット作者のメール)
 git config --global user.email '<YOUR EMAIL>'
+# PowerShell の git log で日本語が <E3> のように文字化けするのを防止(設定後に PowerShell を開き直す)
+[Environment]::SetEnvironmentVariable('LESSCHARSET', 'utf-8', 'User')
 ```
 
 ## 5. デーモン起動スクリプト(サーバー)
@@ -197,11 +199,14 @@ Windows の `git daemon` は `--detach` を使えないため、標準エラー�
 - 月次パターン: 日付の「日」(01〜31)で31ファイルを使い回し(約1ヶ月で一巡)
 - 曜日パターン: 曜日(Monday〜Sunday)で7ファイルを使い回し(約1週間で一巡)
 
-通常運用時は `--verbose` を外し、エラー発生時のみ記録することでログ出力を最小限に抑えます(構築・テスト時や障害調査時のみ、一時的に `--verbose` を追加してください)。同名ファイルは、その日の最初の書き込み時に「更新日が今日より古ければ削除」して作り直します(=ローテーション)。変数は `$f`(ログファイル名)だけです。
+通常運用時は `--verbose` を外し、エラー発生時のみ記録することでログ出力を最小限に抑えます(構築・テスト時や障害調査時のみ、一時的に `--verbose` を追加してください)。同名ファイルは、その日の最初の書き込み時に「更新日が今日より古ければ削除」して作り直します(=ローテーション)。また、タスク停止時に残った子プロセス(`git-daemon.exe`)によるポート競合を防ぐため、起動前に残存プロセスを掃除します。変数は `$f`(ログファイル名)だけです。
 
 ### 5-1. 月次パターン `D:\Git\scripts\Start-GitDaemon_Monthly.ps1`
 
 ```powershell
+# ===== 残存プロセス掃除(タスク停止後に子プロセスが残っていた場合のポート競合を防止) =====
+Stop-Process -Name git-daemon -Force -ErrorAction SilentlyContinue
+
 # ===== git daemon 起動(ログ=日付の「日」ごと git-daemon_01.log 〜 git-daemon_31.log)=====
 # --reuseaddr: 無効(既定)→有効(再起動直後に Address already in use で起動失敗するのを防ぐ)
 # --listen=0.0.0.0: IPv4/IPv6の全NIC(既定)→IPv4の全NIC(LANのNICだけに絞るならサーバーIPに置換)
@@ -242,6 +247,9 @@ Windows の `git daemon` は `--detach` を使えないため、標準エラー�
 月次との違いは、ログファイル名の行(`$f = ...`)だけです。デーモンのオプションとコメントは 5-1 と同一です。
 
 ```powershell
+# ===== 残存プロセス掃除 =====
+Stop-Process -Name git-daemon -Force -ErrorAction SilentlyContinue
+
 # ===== git daemon 起動(ログ=曜日ごと git-daemon_Monday.log 〜 git-daemon_Sunday.log)=====
 # (オプションの意図コメントは 5-1 と同じ)
 & 'C:\Program Files\Git\cmd\git.exe' daemon `
@@ -318,7 +326,11 @@ git -C D:/Git/repos/Workspace0/Project1.git symbolic-ref HEAD
 
 ## 8. リポジトリ設定ファイル(.gitattributes)
 
-リポジトリ直下に置きます(各リポジトリに1つ)。clone した全員に自動で効くため、クライアント側の個別設定は不要です。`* -text` が先頭で、後ろの行ほど優先されるので `binary` の行はその下に並べます。UTF-8(BOMなし)で保存してください。svg・rtf・dxf・dat・csv・cer・res・eml は判定が分かれるため含めていません(テキスト扱いでも改行は変換されません)。
+リポジトリ直下に置きます(各リポジトリに1つ)。clone した全員に自動で効くため、クライアント側の個別設定は不要です。`* -text` が先頭で、後ろの行ほど優先されるので `binary` の行はその下に並べます。
+
+※ **保存時の注意**: Windows のメモ帳で保存するとファイル名が `.gitattributes.txt` になったり、UTF-8 (BOM 付き) になって先頭行の `* -text` が効かなくなることがあります。必ず **「UTF-8 (BOM なし)」かつ拡張子なしの `.gitattributes`** として保存してください(PowerShell の `[IO.File]::WriteAllText` 等を使うと確実です)。
+
+svg・rtf・dxf・dat・csv・cer・res・eml は判定が分かれるため含めていません(テキスト扱いでも改行は変換されません)。
 
 ```text
 # ===== 改行: 一切変換しない =====
@@ -523,7 +535,7 @@ git -C D:/Git/repos/Workspace0/Project1.git symbolic-ref HEAD
 git -C C:/Work/Project1 ls-files --eol | Tee-Object -FilePath 'C:\GitBuild\before\repo_Project1_eol.txt'
 # clone: 接続先は常にポート付き(新規の空リポジトリでは空リポジトリの警告が出るが正常)
 git clone git://192.168.1.10:9418/Workspace0/Project1.git C:/Work/Project1
-# ここで C:\Work\Project1 の直下に .gitattributes を保存する(手作業)
+# ここで C:\Work\Project1\.gitattributes を UTF-8(BOMなし)で保存する(拡張子 .txt が付かないよう注意)
 # add: .gitattributes をステージ
 git -C C:/Work/Project1 add .gitattributes
 # commit: 設定ファイルの追加を記録
@@ -537,7 +549,7 @@ git -C C:/Work/Project1 push origin main
 1. フェーズ2: Git for Windows を全て既定でインストール
 2. フェーズ3-0 → 3-1(管理者 PowerShell。サーバーと同じコマンド)
 3. フェーズ4-0 → 4-1(自分のアカウント。user.name と user.email だけ自分の値)
-4. 作業フォルダに clone(接続先は常にポート付き)
+4. 作業フォルダに clone(接続先は常にポート付き。Windows の 260 文字制限回避のため `C:/Work` 等の浅いパスに置く)
 
 ```powershell
 # 初回: clone(例: C:/Work 配下)
@@ -587,28 +599,34 @@ git -C C:/Work/Test1 ls-files --eol
 git -C C:/Work/Test1 commit -m 'test: eol'
 # push: push.autoSetupRemote により初回でも git push だけで通ること
 git -C C:/Work/Test1 push
-# force push の拒否確認: non-fast-forward で拒否されること(receive.denyNonFastForwards=true)
+# force push の拒否確認: non-fast-forward でエラー拒否されること(拒否されれば合格: receive.denyNonFastForwards=true)
 git -C C:/Work/Test1 commit --amend -m 'test: amended'
 git -C C:/Work/Test1 push --force
-# リモートブランチ削除の拒否確認: deleting a remote branch is not allowed で拒否されること(receive.denyDeletes=true)
+# リモートブランチ削除の拒否確認: deleting a remote branch is not allowed でエラー拒否されること(拒否されれば合格: receive.denyDeletes=true)
 git -C C:/Work/Test1 push origin --delete main
 ```
 
-別のPCから同じURLを clone して `git pull` で内容が取れること、別ユーザーの push が自分の pull に反映されることも確認します。最後に `--verbose` を一時追加していた場合は元に戻してタスクを再起動し、サーバーを再起動してログオンしない状態で 9418 が LISTEN になること(自動起動)を確認後、テスト用リポジトリを削除します。
+別のPCから同じURLを clone して `git pull` で内容が取れること、別ユーザーの push が自分の pull に反映されることも確認します。最後に `--verbose` を一時追加していた場合は元に戻してタスクを再起動し、サーバーを再起動してログオンしない状態で 9418 が LISTEN になること(自動起動)を確認後、テスト用リポジトリと作業フォルダを削除します。
 
 ```powershell
 # テスト用リポジトリ削除(サーバー側)
 Remove-Item -Recurse -Force D:/Git/repos/Workspace0/Test1.git
 ```
 
+```powershell
+# テスト用作業フォルダ削除(クライアント側)
+Remove-Item -Recurse -Force C:\Work\Test1
+```
+
 ## 11. 保守と注意点
 
 ```powershell
-# デーモン停止
+# デーモン停止(親タスク停止後に残存する git-daemon.exe も確実に終了)
 Stop-ScheduledTask -TaskName 'Git Daemon'
+Stop-Process -Name git-daemon -Force -ErrorAction SilentlyContinue
 # デーモン起動
 Start-ScheduledTask -TaskName 'Git Daemon'
-# 残プロセスの確認: 停止後に残っていないこと(残る場合は Stop-Process で終了)
+# 残プロセスの確認: 停止後に残っていないこと
 Get-Process git, git-daemon -ErrorAction SilentlyContinue
 # 設定の確認: 値と出所(system / global / local)
 git config --list --show-origin
@@ -623,12 +641,8 @@ git config --list --show-origin
 - NTP同期なしのため、サーバー時刻がずれるとデーモンログの時刻がずれます(コミット時刻はクライアントPCの時刻)
 - Shift\_JIS のソースは変換されずそのまま保存されます。UTF-8 でない差分は文字化けして見えることがありますが、保存内容は変わっていません
 
-### 未検証・要確認
+### 実機確認時の最終チェック項目
 
-- 本ガイドは Web 検索をせず知識ベースで作成し、実機では未検証です。最終確認は公式ドキュメント(https://git-scm.com/docs/git-daemon 、`git help daemon` `git help config` `git help gitattributes`)で行ってください
-- `--timeout` は公式上「サブリクエスト単位のタイムアウト」です。大容量の push で切断される場合は値を延ばしてください(要確認)
-- タスクの「終了」で子プロセスの git daemon も止まるか(要確認)。止まらない場合は `Stop-Process -Name git-daemon -Force`
-- `safe.directory '*'` のワイルドカードは比較的新しい Git for Windows が必要です(2.35.3以降、要確認)
-- 日本語を含む `git log` が PowerShell で `<E3>` のように崩れる場合は `less` の文字コード指定が必要です: `[Environment]::SetEnvironmentVariable('LESSCHARSET','utf-8','User')` を実行して PowerShell を開き直す(要確認)
-- `~` を使う 4-0 の `Tee-Object -FilePath` が Windows PowerShell 5.1 で解決されない場合は `~` を `C:\Users\<ユーザー名>` に置き換えてください(要確認)
-- system 設定の `core.editor notepad` が Git for Windows の既定の起動方法で問題なく使えるか(要確認。使えない場合は `C:\Windows\notepad.exe` のフルパス指定に変える)
+- 本ガイドは実機未検証のため、初回構築時は公式ドキュメント(https://git-scm.com/docs/git-daemon 、`git help daemon` `git help config` `git help gitattributes`)と合わせて実機で以下を確認してください
+- `--timeout 900` での大容量リポジトリの clone / push が途中で切れないか(切れる場合は値を延長)
+- `core.editor notepad` でメッセージ入力時にメモ帳が開き、保存終了後にコミットが完了するか
