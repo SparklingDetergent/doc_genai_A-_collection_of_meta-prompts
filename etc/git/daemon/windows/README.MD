@@ -1,6 +1,5 @@
 
 
-````
 
 ### Windows Server 2022 + Git for Windows + Windows 11 Gitクライアント構築設計書
 
@@ -1165,8 +1164,5 @@ NTPなしの制約
 * Windows Firewallを有効にし、9418番だけをLANに公開。
 
 
-
-
-````
 
 
